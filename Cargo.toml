@@ -27,5 +27,5 @@ hyper = { version = "0.14", default-features = false, features = ["server", "tcp
 anyhow = "1.0"
 
 [dev-dependencies]
-# hyper = { version = "0.14", features = ["tcp", "server", "http1"] }
+hyper = { version = "0.14", features = ["tcp", "server", "http1"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros"], default-features = false }

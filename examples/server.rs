@@ -3,7 +3,7 @@
 #![deny(rust_2018_idioms)]
 #![deny(dead_code)]
 
-use hyper::{Server, StatusCode};
+use hyper::{header, Server, StatusCode};
 use std::{net::SocketAddr, path::PathBuf};
 
 use hyper_middleware::{
@@ -21,10 +21,10 @@ struct Application {
 
 impl Handler for Application {
     fn handle(&self, req: &mut Request) -> Result<Response> {
-        // Access Hyper incoming Request
+        // Access the Hyper incoming Request
         println!("URI Path: {}", req.uri().path());
 
-        // Access custom app options
+        // Access the custom app options
         println!("Config Root: {}", self.opts.root.display());
 
         // Access the Remote Address
@@ -33,7 +33,7 @@ impl Handler for Application {
             req.extensions().get::<SocketAddr>().unwrap()
         );
 
-        // Send a response back to the middlewares chain
+        // Create an Hyper Response and send it back to the middlewares chain
         Ok(Response::builder().body(Body::from("¡Hola!")).unwrap())
     }
 }
@@ -41,8 +41,12 @@ impl Handler for Application {
 struct FirstMiddleware {}
 
 impl BeforeMiddleware for FirstMiddleware {
-    fn before(&self, _: &mut Request) -> Result<()> {
+    fn before(&self, req: &mut Request) -> Result<()> {
         println!("First Middleware called!");
+
+        // Access the Hyper incoming Request
+        println!("URI Path: {}", req.uri().path());
+
         Ok(())
     }
 
@@ -54,8 +58,16 @@ impl BeforeMiddleware for FirstMiddleware {
 struct SecondMiddleware {}
 
 impl AfterMiddleware for SecondMiddleware {
-    fn after(&self, _: &mut Request, res: Response) -> Result<Response> {
+    fn after(&self, _: &mut Request, mut res: Response) -> Result<Response> {
         println!("Second Middleware called!");
+
+        // Mutate the Hyper Response at convenience
+        // and send it back to other middlewares on the chain
+        res.headers_mut().insert(
+            header::CONTENT_TYPE,
+            "text/html; charset=utf-8".parse().unwrap(),
+        );
+
         Ok(res)
     }
 
@@ -81,7 +93,7 @@ async fn main() -> Result {
     handler.link_before(FirstMiddleware {});
     handler.link_after(SecondMiddleware {});
 
-    // 3. Create a Hyper service and set the current handler with its middlewares
+    // 3. Create an Hyper service and set the current handler with its middlewares
     let service = Service::new(handler);
 
     // 4. Finally just run server using the service already created
