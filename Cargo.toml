@@ -1,0 +1,31 @@
+[package]
+name = "hyper-middleware"
+description = "A compact middleware and handler system for Hyper inspired by The Iron Framework."
+version = "0.0.0"
+authors = ["Jose Quintana <https://joseluisq.net>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/static-web-server/hyper-middleware"
+documentation = "https://docs.rs/unzpack"
+edition = "2018"
+categories = ["network-programming", "web-programming::http-server"]
+include = [
+    "src/**/*",
+    "Cargo.toml",
+    "LICENSE-MIT",
+    "LICENSE-APACHE"
+]
+
+keywords = [
+    "hyper",
+    "hyper-rs",
+    "middleware",
+    "service",
+]
+
+[dependencies]
+hyper = { version = "0.14", default-features = false, features = ["server", "tcp"] }
+anyhow = "1.0"
+
+[dev-dependencies]
+# hyper = { version = "0.14", features = ["tcp", "server", "http1"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros"], default-features = false }
