@@ -25,6 +25,7 @@ keywords = [
 [dependencies]
 hyper = { version = "0.14", default-features = false, features = ["server", "tcp"] }
 anyhow = "1.0"
+thiserror = "1.0"
 
 [dev-dependencies]
 hyper = { version = "0.14", features = ["tcp", "server", "http1"] }
