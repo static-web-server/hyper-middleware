@@ -22,7 +22,7 @@ struct Application {
 impl Handler for Application {
     fn handle(&self, req: &mut Request) -> Result<Response> {
         // Access the Hyper incoming Request
-        println!("URI Path: {}", req.uri().path());
+        println!("Handler - URI Path: {}", req.uri().path());
 
         // Access the custom app options
         println!("Config Root: {}", self.opts.root.display());
@@ -33,7 +33,7 @@ impl Handler for Application {
             req.extensions().get::<SocketAddr>().unwrap()
         );
 
-        // Create an Hyper Response and send it back to the middlewares chain
+        // Create a Hyper Response and send it back to the middlewares chain
         Ok(Response::builder().body(Body::from("¡Hola!")).unwrap())
     }
 }
@@ -41,16 +41,16 @@ impl Handler for Application {
 struct FirstMiddleware {}
 
 impl BeforeMiddleware for FirstMiddleware {
-    fn before(&self, req: &mut Request) -> Result<()> {
+    fn before(&self, req: &mut Request) -> Result {
         println!("First Middleware called!");
 
         // Access the Hyper incoming Request
-        println!("URI Path: {}", req.uri().path());
+        println!("First - URI Path: {}", req.uri().path());
 
         Ok(())
     }
 
-    fn catch(&self, _: &mut Request, err: Error) -> Result<()> {
+    fn catch(&self, _: &mut Request, err: Error) -> Result {
         Err(err)
     }
 }
@@ -79,7 +79,7 @@ impl AfterMiddleware for SecondMiddleware {
     }
 }
 
-#[tokio::main(flavor = "multi_thread", worker_threads = 32)]
+#[tokio::main(flavor = "multi_thread")]
 async fn main() -> Result {
     // 0. Define some app options (example only)
     let opts = Config {

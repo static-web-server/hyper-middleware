@@ -1,12 +1,17 @@
-# Hyper Middleware (WIP)
+# Hyper Middleware
 
-> A compact middleware and handler system for [Hyper](https://github.com/hyperium/hyper) `0.14.x`.
+[![hyper-middleware crate](https://img.shields.io/crates/v/hyper-middleware.svg)](https://crates.io/crates/hyper-middleware)
+[![Released API docs](https://docs.rs/hyper-middleware/badge.svg)](https://docs.rs/hyper-middleware)
+[![hyper-middleware crate license](https://img.shields.io/crates/l/hyper-middleware)](./LICENSE-MIT)
+
+> A compact HTTP middleware and handler system for [Hyper](https://github.com/hyperium/hyper) `0.14.x`.<br>
+> **NOTE:** This crate is still under active development.
 
 ## Features
 
 - Compact Middleware and Handler System inspired by [The Iron Framework](https://github.com/iron/iron).
-- Simple Hyper Service with convenient __Remote Address__ access.
-- Error and return types powered by [anyhow](https://github.com/dtolnay/anyhow).
+- Simple [Hyper Service](https://docs.rs/hyper/latest/hyper/service/trait.Service.html) with convenient __Remote Address__ access.
+- Convenient `Error` and `Result` types powered by [anyhow](https://github.com/dtolnay/anyhow).
 
 ## Example
 
@@ -34,7 +39,7 @@ struct Application {
 impl Handler for Application {
     fn handle(&self, req: &mut Request) -> Result<Response> {
         // Access the Hyper incoming Request
-        println!("URI Path: {}", req.uri().path());
+        println!("Handler - URI Path: {}", req.uri().path());
 
         // Access the custom app options
         println!("Config Root: {}", self.opts.root.display());
@@ -45,7 +50,7 @@ impl Handler for Application {
             req.extensions().get::<SocketAddr>().unwrap()
         );
 
-        // Create an Hyper Response and send it back to the middlewares chain
+        // Create a Hyper Response and send it back to the middlewares chain
         Ok(Response::builder().body(Body::from("¡Hola!")).unwrap())
     }
 }
@@ -53,16 +58,16 @@ impl Handler for Application {
 struct FirstMiddleware {}
 
 impl BeforeMiddleware for FirstMiddleware {
-    fn before(&self, req: &mut Request) -> Result<()> {
+    fn before(&self, req: &mut Request) -> Result {
         println!("First Middleware called!");
 
         // Access the Hyper incoming Request
-        println!("URI Path: {}", req.uri().path());
+        println!("First - URI Path: {}", req.uri().path());
 
         Ok(())
     }
 
-    fn catch(&self, _: &mut Request, err: Error) -> Result<()> {
+    fn catch(&self, _: &mut Request, err: Error) -> Result {
         Err(err)
     }
 }
@@ -91,7 +96,7 @@ impl AfterMiddleware for SecondMiddleware {
     }
 }
 
-#[tokio::main(flavor = "multi_thread", worker_threads = 32)]
+#[tokio::main(flavor = "multi_thread")]
 async fn main() -> Result {
     // 0. Define some app options (example only)
     let opts = Config {
@@ -130,8 +135,7 @@ cargo run --example server
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in current work by you, as defined in the Apache-2.0 license, shall be dual licensed as described below, without any additional terms or conditions.
 
-Feel free to send some [Pull request](https://github.com/static-web-server/hyper-middleware/pulls) or [issue](https://github.com/static-web-server/hyper-middleware/issues).
-
+Feel free to send some [Pull request](https://github.com/static-web-server/hyper-middleware/pulls) or file an [issue](https://github.com/static-web-server/hyper-middleware/issues).
 
 ## License
 

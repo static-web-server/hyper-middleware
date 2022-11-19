@@ -1,12 +1,12 @@
 //! The Iron middleware and handler system for latest Hyper `0.14.x`.
 //! It is borrowed from the Iron project and adapted at convenience.
 //!
-//! https://github.com/iron/iron/blob/master/iron/src/middleware/mod.rs
+//! <https://github.com/iron/iron/blob/master/iron/src/middleware/mod.rs>
 //!
 //! The Iron middleware and handler system are the fundamental building blocks
 //! for handling HTTP requests and generating responses with Hyper.
 //!
-//! This module is intended to work with latest Hyper `0.14.x` or higher.
+//! This module is intended to work with latest Hyper `0.14.x`.
 //!
 //! # Handlers
 //!

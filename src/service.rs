@@ -5,9 +5,9 @@ use std::future::{ready, Ready};
 use std::task::{Context, Poll};
 
 use self::handler_service::{HandlerService, HandlerServiceBuilder};
-use crate::Handler;
+use crate::middleware::Handler;
 
-/// Hyper Service entry point which hosts an `Handler`.
+/// Hyper Service entry point which hosts a `Handler`.
 pub struct Service<H> {
     builder: HandlerServiceBuilder<H>,
 }
@@ -48,8 +48,9 @@ mod handler_service {
     use std::sync::Arc;
     use std::task::{Context, Poll};
 
+    use crate::middleware::Handler;
     use crate::service::HyperService;
-    use crate::{Error, Handler, Request, Response, Result};
+    use crate::types::{Error, Request, Response, Result};
 
     pub struct HandlerService<H> {
         handler: Arc<H>,
