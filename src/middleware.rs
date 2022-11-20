@@ -1,12 +1,9 @@
-//! The Iron middleware and handler system for latest Hyper `0.14.x`.
-//! It is borrowed from the Iron project and adapted at convenience.
+//! The middleware and handler system module.
 //!
-//! <https://github.com/iron/iron/blob/master/iron/src/middleware/mod.rs>
+//! It's highly inspired by [The Iron middleware & handler system](https://github.com/iron/iron/blob/master/iron/src/middleware/mod.rs) and intended to work with latest [Hyper][`hyper`] `0.14`.
 //!
-//! The Iron middleware and handler system are the fundamental building blocks
+//! The middleware and handler system are the fundamental building blocks
 //! for handling HTTP requests and generating responses with Hyper.
-//!
-//! This module is intended to work with latest Hyper `0.14.x`.
 //!
 //! # Handlers
 //!
@@ -19,7 +16,7 @@
 //! Here's an example of a `Handler`:
 //!
 //! ```rust
-//! use hyper_middleware::{Request, Response};
+//! use hyper_middleware::{Request, Response, Result};
 //!
 //! fn hello_handler(req: &mut Request) -> Result<Response> {
 //!     Ok(Response::builder().body(Body::from("¡Hola!")).unwrap())
@@ -56,32 +53,41 @@
 //!
 //! ```rust
 //! use hyper::Server;
-//! use hyper_middleware::{Request, Response, RouterService};
+//! use hyper_middleware::{BeforeMiddleware, Body, Chain, Request, Response, Result, Service};
 //!
-//! fn hello_handler(req: &mut Request) -> Result<Response> {
-//!     Ok(Response::builder().body(Body::from("¡Hola!")).unwrap())
-//! };
+//! fn hello_handler(_req: &mut Request) -> Result<Response> {
+//!      let mut resp = Response::new(Body::from("¡Hola!"));
+//!      resp.headers_mut().insert(
+//!          header::CONTENT_TYPE,
+//!          "text/html; charset=utf-8".parse().unwrap(),
+//!      );
+//!      Ok(resp)
+//! }
 //!
-//! struct RequestLoggingMiddleware {};
+//! struct RequestLoggingMiddleware {}
 //! impl BeforeMiddleware for RequestLoggingMiddleware {
-//!     fn before(&self, req: &mut Request) -> Result<()> {
+//!     fn before(&self, req: &mut Request) -> Result {
 //!         println!("{:?}", req);
 //!         Ok(())
 //!     }
 //! }
 //!
+//! #[tokio::main(flavor = "multi_thread")]
 //! async fn main() -> Result {
 //!     let mut chain = Chain::new(hello_handler);
+//!     // Plug in the custom middleware(s)
 //!     chain.link_before(RequestLoggingMiddleware {});
 //!
 //!     let addr = ([127, 0, 0, 1], 8787).into();
-//!     let service = RouterService::new(chain);
-
+//!     let service = Service::new(chain);
 //!     let server = Server::bind(&addr).serve(service);
 //!     println!("Listening on http://{}", addr);
 //!
 //!     server.await?;
+//!
+//!     Ok(())
 //! }
+
 //! ```
 //!
 //! # The Request Handling Flow

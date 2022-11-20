@@ -1,3 +1,42 @@
+//! The Hyper service module.
+//!
+//! It provides a [Hyper Service][`hyper::service::Service`] implementation intended to work with
+//! the [Hyper Server Builder][`hyper::server::Builder`].
+//!
+//! The service allows to bind a [`Chain`][`super::Chain`] of middlewares.
+//!
+//! ## Example
+//!
+//! ```rust
+//! use hyper::Server;
+//! use hyper_middleware::{
+//!     Body, Handler, Request, Response, Result, Service
+//! };
+//!
+//! struct Application {}
+//! impl Handler for Application {
+//!     fn handle(&self, _req: &mut Request) -> Result<Response> {
+//!         // Create a response and send it back to the middlewares chain
+//!         Ok(Response::new(Body::from("¡Hola!")))
+//!     }
+//! }
+//!
+//! #[tokio::main(flavor = "multi_thread")]
+//! async fn main() -> Result {
+//!     let mut my_handler = Chain::new(Application {});
+//!
+//!     let my_service = Service::new(my_handler);
+//!
+//!     let addr = ([127, 0, 0, 1], 8787).into();
+//!     let server = Server::bind(&addr).serve(my_service);
+//!
+//!     println!("Listening on http://{}", addr);
+//!
+//!     server.await?;
+//!     Ok(())
+//! }
+//! ```
+
 use hyper::server::conn::AddrStream;
 use hyper::service::Service as HyperService;
 use std::convert::Infallible;
@@ -7,7 +46,7 @@ use std::task::{Context, Poll};
 use self::handler_service::{HandlerService, HandlerServiceBuilder};
 use crate::middleware::Handler;
 
-/// Hyper Service entry point which hosts a `Handler`.
+/// A [Hyper Service][`hyper::service::Service`] entry point which hosts a [`Handler`].
 pub struct Service<H> {
     builder: HandlerServiceBuilder<H>,
 }
