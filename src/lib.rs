@@ -13,9 +13,11 @@
 //!
 
 pub mod middleware;
+pub mod remote_addr;
 pub mod service;
 pub mod types;
 
 pub use middleware::*;
+pub use remote_addr::*;
 pub use service::*;
 pub use types::*;

@@ -37,7 +37,6 @@
 //! }
 //! ```
 
-use hyper::server::conn::AddrStream;
 use hyper::service::Service as HyperService;
 use std::convert::Infallible;
 use std::future::{ready, Ready};
@@ -45,6 +44,7 @@ use std::task::{Context, Poll};
 
 use self::handler_service::{HandlerService, HandlerServiceBuilder};
 use crate::middleware::Handler;
+use crate::remote_addr::RemoteAddr;
 
 /// A [Hyper Service][`hyper::service::Service`] entry point which hosts a [`Handler`].
 pub struct Service<H> {
@@ -63,9 +63,10 @@ where
     }
 }
 
-impl<H> HyperService<&AddrStream> for Service<H>
+impl<H, T> HyperService<&T> for Service<H>
 where
     H: Handler,
+    T: RemoteAddr + Send + 'static,
 {
     type Response = HandlerService<H>;
     type Error = Infallible;
@@ -75,7 +76,7 @@ where
         Poll::Ready(Ok(()))
     }
 
-    fn call(&mut self, conn: &AddrStream) -> Self::Future {
+    fn call(&mut self, conn: &T) -> Self::Future {
         ready(Ok(self.builder.build(conn.remote_addr())))
     }
 }
@@ -93,7 +94,7 @@ mod handler_service {
 
     pub struct HandlerService<H> {
         handler: Arc<H>,
-        remote_addr: SocketAddr,
+        remote_addr: Option<SocketAddr>,
     }
 
     impl<H> HyperService<Request> for HandlerService<H>
@@ -109,7 +110,9 @@ mod handler_service {
         }
 
         fn call(&mut self, mut req: Request) -> Self::Future {
-            req.extensions_mut().insert(self.remote_addr);
+            if let Some(remote_addr) = self.remote_addr {
+                req.extensions_mut().insert(remote_addr);
+            }
             let res = self.handler.handle(&mut req);
             Box::pin(async { res })
         }
@@ -129,7 +132,7 @@ mod handler_service {
             }
         }
 
-        pub fn build(&self, remote_addr: SocketAddr) -> HandlerService<H> {
+        pub fn build(&self, remote_addr: Option<SocketAddr>) -> HandlerService<H> {
             HandlerService {
                 handler: self.handler.clone(),
                 remote_addr,
