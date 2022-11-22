@@ -51,7 +51,7 @@ impl Handler for Application {
         );
 
         // Create a Hyper Response and send it back to the middlewares chain
-        Ok(Response::builder().body(Body::from("¡Hola!")).unwrap())
+        Ok(Response::new(Body::from("¡Hola!")))
     }
 }
 
@@ -110,7 +110,7 @@ async fn main() -> Result {
     handler.link_before(FirstMiddleware {});
     handler.link_after(SecondMiddleware {});
 
-    // 3. Create an Hyper service and set the current handler with its middlewares
+    // 3. Create a Hyper service and set the current handler with its middlewares
     let service = Service::new(handler);
 
     // 4. Finally just run server using the service already created
