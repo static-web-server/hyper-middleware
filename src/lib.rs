@@ -12,11 +12,13 @@
 //! - Convenient [`Error`] and [`Result`] types powered by [anyhow](https://github.com/dtolnay/anyhow).
 //!
 
+pub mod error;
 pub mod middleware;
 pub mod remote_addr;
 pub mod service;
 pub mod types;
 
+pub use error::*;
 pub use middleware::*;
 pub use remote_addr::*;
 pub use service::*;

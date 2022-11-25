@@ -88,9 +88,10 @@ mod handler_service {
     use std::sync::Arc;
     use std::task::{Context, Poll};
 
+    use crate::error::Error;
     use crate::middleware::Handler;
     use crate::service::HyperService;
-    use crate::types::{Error, Request, Response, Result};
+    use crate::types::{Request, Response, Result};
 
     pub struct HandlerService<H> {
         handler: Arc<H>,
