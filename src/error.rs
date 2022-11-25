@@ -68,7 +68,7 @@ impl From<&str> for Error {
 #[macro_export]
 macro_rules! http_error {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), None)
+        $crate::Error::from(anyhow::anyhow!($($arg)*))
     }}
 }
 
@@ -77,7 +77,7 @@ macro_rules! http_error {
 #[macro_export]
 macro_rules! bad_request {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::BAD_REQUEST))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::BAD_REQUEST))
     }}
 }
 
@@ -85,7 +85,7 @@ macro_rules! bad_request {
 #[macro_export]
 macro_rules! unauthorized {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::UNAUTHORIZED))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::UNAUTHORIZED))
     }}
 }
 
@@ -93,7 +93,7 @@ macro_rules! unauthorized {
 #[macro_export]
 macro_rules! payment_required {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::PAYMENT_REQUIRED))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::PAYMENT_REQUIRED))
     }}
 }
 
@@ -101,7 +101,7 @@ macro_rules! payment_required {
 #[macro_export]
 macro_rules! forbidden {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::FORBIDDEN))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::FORBIDDEN))
     }}
 }
 
@@ -109,7 +109,7 @@ macro_rules! forbidden {
 #[macro_export]
 macro_rules! not_found {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::NOT_FOUND))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::NOT_FOUND))
     }}
 }
 
@@ -117,7 +117,7 @@ macro_rules! not_found {
 #[macro_export]
 macro_rules! method_not_allowed {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::METHOD_NOT_ALLOWED))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::METHOD_NOT_ALLOWED))
     }}
 }
 
@@ -125,7 +125,7 @@ macro_rules! method_not_allowed {
 #[macro_export]
 macro_rules! not_acceptable {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::NOT_ACCEPTABLE))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::NOT_ACCEPTABLE))
     }}
 }
 
@@ -133,7 +133,7 @@ macro_rules! not_acceptable {
 #[macro_export]
 macro_rules! proxy_authentication_required {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::PROXY_AUTHENTICATION_REQUIRED))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::PROXY_AUTHENTICATION_REQUIRED))
     }}
 }
 
@@ -141,7 +141,7 @@ macro_rules! proxy_authentication_required {
 #[macro_export]
 macro_rules! request_timeout {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::REQUEST_TIMEOUT))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::REQUEST_TIMEOUT))
     }}
 }
 
@@ -149,7 +149,7 @@ macro_rules! request_timeout {
 #[macro_export]
 macro_rules! conflict {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::CONFLICT))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::CONFLICT))
     }}
 }
 
@@ -157,7 +157,7 @@ macro_rules! conflict {
 #[macro_export]
 macro_rules! gone {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::GONE))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::GONE))
     }}
 }
 
@@ -165,7 +165,7 @@ macro_rules! gone {
 #[macro_export]
 macro_rules! length_required {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::LENGTH_REQUIRED))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::LENGTH_REQUIRED))
     }}
 }
 
@@ -173,7 +173,7 @@ macro_rules! length_required {
 #[macro_export]
 macro_rules! precondition_failed {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::PRECONDITION_FAILED))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::PRECONDITION_FAILED))
     }}
 }
 
@@ -181,7 +181,7 @@ macro_rules! precondition_failed {
 #[macro_export]
 macro_rules! payload_too_large {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::PAYLOAD_TOO_LARGE))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::PAYLOAD_TOO_LARGE))
     }}
 }
 
@@ -189,7 +189,7 @@ macro_rules! payload_too_large {
 #[macro_export]
 macro_rules! uri_too_long {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::URI_TOO_LONG))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::URI_TOO_LONG))
     }}
 }
 
@@ -197,7 +197,7 @@ macro_rules! uri_too_long {
 #[macro_export]
 macro_rules! unsupported_media_type {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::UNSUPPORTED_MEDIA_TYPE))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::UNSUPPORTED_MEDIA_TYPE))
     }}
 }
 
@@ -205,7 +205,7 @@ macro_rules! unsupported_media_type {
 #[macro_export]
 macro_rules! range_not_satisfiable {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::RANGE_NOT_SATISFIABLE))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::RANGE_NOT_SATISFIABLE))
     }}
 }
 
@@ -213,7 +213,7 @@ macro_rules! range_not_satisfiable {
 #[macro_export]
 macro_rules! expectation_failed {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::EXPECTATION_FAILED))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::EXPECTATION_FAILED))
     }}
 }
 
@@ -222,7 +222,7 @@ macro_rules! expectation_failed {
 #[macro_export]
 macro_rules! internal_server_error {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::INTERNAL_SERVER_ERROR))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::INTERNAL_SERVER_ERROR))
     }}
 }
 
@@ -230,7 +230,7 @@ macro_rules! internal_server_error {
 #[macro_export]
 macro_rules! not_implemented {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::NOT_IMPLEMENTED))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::NOT_IMPLEMENTED))
     }}
 }
 
@@ -238,7 +238,7 @@ macro_rules! not_implemented {
 #[macro_export]
 macro_rules! bad_gateway {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::BAD_GATEWAY))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::BAD_GATEWAY))
     }}
 }
 
@@ -246,7 +246,7 @@ macro_rules! bad_gateway {
 #[macro_export]
 macro_rules! service_unavailable {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::SERVICE_UNAVAILABLE))
+        $crate::Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::SERVICE_UNAVAILABLE))
     }}
 }
 
@@ -254,7 +254,7 @@ macro_rules! service_unavailable {
 #[macro_export]
 macro_rules! gateway_timeout {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::GATEWAY_TIMEOUT))
+        Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::GATEWAY_TIMEOUT))
     }}
 }
 
@@ -262,7 +262,7 @@ macro_rules! gateway_timeout {
 #[macro_export]
 macro_rules! http_version_not_supported {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::HTTP_VERSION_NOT_SUPPORTED))
+        Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::HTTP_VERSION_NOT_SUPPORTED))
     }}
 }
 
@@ -270,7 +270,7 @@ macro_rules! http_version_not_supported {
 #[macro_export]
 macro_rules! variant_also_negotiates {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::VARIANT_ALSO_NEGOTIATES))
+        Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::VARIANT_ALSO_NEGOTIATES))
     }}
 }
 
@@ -278,7 +278,7 @@ macro_rules! variant_also_negotiates {
 #[macro_export]
 macro_rules! insufficient_storage {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::INSUFFICIENT_STORAGE))
+        Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::INSUFFICIENT_STORAGE))
     }}
 }
 
@@ -286,6 +286,6 @@ macro_rules! insufficient_storage {
 #[macro_export]
 macro_rules! loop_detected {
     ($($arg:tt)*) => {{
-        Error::from_err(anyhow::anyhow!($($arg)*), Some(StatusCode::LOOP_DETECTED))
+        Error::from(anyhow::anyhow!($($arg)*)).with_status(Some(StatusCode::LOOP_DETECTED))
     }}
 }
