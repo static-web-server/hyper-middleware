@@ -1,6 +1,4 @@
-//! Set of types aliases for convenience.
-
-use crate::Error;
+//! Set of HTTP types aliases for convenience.
 
 /// A [`hyper::Body`] type alias.
 pub type Body = hyper::Body;
@@ -10,6 +8,3 @@ pub type Request<T = Body> = hyper::Request<T>;
 
 /// A [`hyper::Response<Body>`] type alias.
 pub type Response<T = Body> = hyper::Response<T>;
-
-/// An [`anyhow::Result`] type alias.
-pub type Result<T = (), E = Error> = anyhow::Result<T, E>;

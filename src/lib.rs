@@ -13,13 +13,13 @@
 //!
 
 pub mod error;
+pub mod http;
 pub mod middleware;
 pub mod remote_addr;
 pub mod service;
-pub mod types;
 
-pub use error::*;
+pub use error::{Context, Error, Result};
+pub use http::*;
 pub use middleware::*;
 pub use remote_addr::*;
 pub use service::*;
-pub use types::*;
