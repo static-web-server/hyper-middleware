@@ -18,6 +18,8 @@ pub mod middleware;
 pub mod remote_addr;
 pub mod service;
 
+pub use async_recursion::*;
+pub use async_trait::*;
 pub use error::{Context, Error, Result};
 pub use http::*;
 pub use middleware::*;

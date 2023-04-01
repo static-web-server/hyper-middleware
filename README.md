@@ -22,10 +22,9 @@
 
 use hyper::{header, Server, StatusCode};
 use std::{net::SocketAddr, path::PathBuf};
-
 use hyper_middleware::{
-    AfterMiddleware, BeforeMiddleware, Body, Chain, Error, Handler, Request, Response, Result,
-    Service,
+    async_trait, AfterMiddleware, BeforeMiddleware, Body, Chain, Error, Handler, Request, Response,
+    Result, Service,
 };
 
 struct Config {
@@ -36,8 +35,9 @@ struct Application {
     opts: Config,
 }
 
+#[async_trait]
 impl Handler for Application {
-    fn handle(&self, req: &mut Request) -> Result<Response> {
+    async fn handle(&self, req: &mut Request) -> Result<Response> {
         // Access the Hyper incoming Request
         println!("Handler - URI Path: {}", req.uri().path());
 
@@ -57,8 +57,9 @@ impl Handler for Application {
 
 struct FirstMiddleware {}
 
+#[async_trait]
 impl BeforeMiddleware for FirstMiddleware {
-    fn before(&self, req: &mut Request) -> Result {
+    async fn before(&self, req: &mut Request) -> Result {
         println!("First Middleware called!");
 
         // Access the Hyper incoming Request
@@ -67,15 +68,16 @@ impl BeforeMiddleware for FirstMiddleware {
         Ok(())
     }
 
-    fn catch(&self, _: &mut Request, err: Error) -> Result {
+    async fn catch(&self, _: &mut Request, err: Error) -> Result {
         Err(err)
     }
 }
 
 struct SecondMiddleware {}
 
+#[async_trait]
 impl AfterMiddleware for SecondMiddleware {
-    fn after(&self, _: &mut Request, mut res: Response) -> Result<Response> {
+    async fn after(&self, _: &mut Request, mut res: Response) -> Result<Response> {
         println!("Second Middleware called!");
 
         // Mutate the Hyper Response at convenience
@@ -88,7 +90,7 @@ impl AfterMiddleware for SecondMiddleware {
         Ok(res)
     }
 
-    fn catch(&self, _: &mut Request, err: Error) -> Result<Response> {
+    async fn catch(&self, _: &mut Request, err: Error) -> Result<Response> {
         Ok(Response::builder()
             .status(StatusCode::NOT_FOUND)
             .body(Body::from(err.to_string()))

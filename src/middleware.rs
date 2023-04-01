@@ -146,31 +146,37 @@
 //! `Response` should be run during both the normal and error flow by
 //! implementing the `catch` method to also do the necessary action.
 
+use async_recursion::async_recursion;
+use async_trait::async_trait;
 use std::sync::Arc;
 
 use crate::{Error, Request, Response, Result};
 
+#[async_trait]
 /// `Handler`s are responsible for handling requests by creating `Response`s from `Request`s.
 pub trait Handler: Send + Sync + 'static {
     /// Produce a `Response` from a Request, with the possibility of error.
-    fn handle(&self, req: &mut Request) -> Result<Response>;
+    async fn handle(&self, req: &mut Request) -> Result<Response>;
 }
 
+#[async_trait]
 impl<F> Handler for F
 where
     F: Send + Sync + 'static + Fn(&mut Request) -> Result<Response>,
 {
-    fn handle(&self, req: &mut Request) -> Result<Response> {
+    async fn handle(&self, req: &mut Request) -> Result<Response> {
         (*self)(req)
     }
 }
 
+#[async_trait]
 impl Handler for Box<dyn Handler> {
-    fn handle(&self, req: &mut Request) -> Result<Response> {
-        (**self).handle(req)
+    async fn handle(&self, req: &mut Request) -> Result<Response> {
+        (**self).handle(req).await
     }
 }
 
+#[async_trait]
 /// `BeforeMiddleware` are fired before a `Handler` is called inside of a Chain.
 ///
 /// `BeforeMiddleware` are responsible for doing request pre-processing that requires
@@ -183,7 +189,7 @@ impl Handler for Box<dyn Handler> {
 /// instead be `AroundMiddleware`.
 pub trait BeforeMiddleware: Send + Sync + 'static {
     /// Do whatever work this middleware should do with a `Request` object.
-    fn before(&self, _: &mut Request) -> Result<()> {
+    async fn before(&self, _: &mut Request) -> Result<()> {
         Ok(())
     }
 
@@ -192,11 +198,12 @@ pub trait BeforeMiddleware: Send + Sync + 'static {
     /// Returning a `Ok` will cause the request to resume the normal flow at the
     /// next `BeforeMiddleware`, or if this was the last `BeforeMiddleware`,
     /// at the `Handler`.
-    fn catch(&self, _: &mut Request, err: Error) -> Result<()> {
+    async fn catch(&self, _: &mut Request, err: Error) -> Result<()> {
         Err(err)
     }
 }
 
+#[async_trait]
 /// `AfterMiddleware` are fired after a `Handler` is called inside of a `Chain`.
 ///
 /// `AfterMiddleware` receive both a `Request` and a `Response` and are responsible for doing
@@ -208,7 +215,7 @@ pub trait BeforeMiddleware: Send + Sync + 'static {
 /// adding headers or logging.
 pub trait AfterMiddleware: Send + Sync + 'static {
     /// Do whatever post-processing this middleware should do.
-    fn after(&self, _: &mut Request, res: Response) -> Result<Response> {
+    async fn after(&self, _: &mut Request, res: Response) -> Result<Response> {
         Ok(res)
     }
 
@@ -216,11 +223,12 @@ pub trait AfterMiddleware: Send + Sync + 'static {
     ///
     /// Returning `Ok` will cause the request to resume the normal flow at the
     /// next `AfterMiddleware`.
-    fn catch(&self, _: &mut Request, err: Error) -> Result<Response> {
+    async fn catch(&self, _: &mut Request, err: Error) -> Result<Response> {
         Err(err)
     }
 }
 
+#[async_trait(?Send)]
 /// `AroundMiddleware` are used to wrap and replace the `Handler` in a `Chain`.
 ///
 /// `AroundMiddleware` produce `Handler`s through their `around` method, which is
@@ -234,7 +242,7 @@ pub trait AroundMiddleware {
     ///
     /// This is called only once, when an `AroundMiddleware` is added to a `Chain`
     /// using `Chain::around`, it is passed the `Chain`'s current `Handler`.
-    fn around(self, handler: Box<dyn Handler>) -> Box<dyn Handler>;
+    async fn around(self, handler: Box<dyn Handler>) -> Box<dyn Handler>;
 }
 
 /// The middleware chain which can append other middlewares.
@@ -300,32 +308,34 @@ impl Chain {
     }
 
     /// Apply an `AroundMiddleware` to the `Handler` in this `Chain`.
-    pub fn link_around<A>(&mut self, around: A) -> &mut Chain
+    pub async fn link_around<A>(&mut self, around: A) -> &mut Chain
     where
         A: AroundMiddleware,
     {
         let mut handler = self.handler.take().unwrap();
-        handler = around.around(handler);
+        handler = around.around(handler).await;
         self.handler = Some(handler);
         self
     }
 }
 
+#[async_trait]
 impl Handler for Chain {
-    fn handle(&self, req: &mut Request) -> Result<Response> {
+    async fn handle(&self, req: &mut Request) -> Result<Response> {
         // Kick off at befores, which will continue into handler
         // then afters.
-        self.continue_from_before(req, 0)
+        self.continue_from_before(req, 0).await
     }
 }
 
 impl Chain {
+    #[async_recursion]
     // Enter the error flow from a before middleware, starting
     // at the passed index.
     //
     // If the index is out of bounds for the before middleware Vec,
     // this instead behaves the same as fail_from_handler.
-    fn fail_from_before(
+    async fn fail_from_before(
         &self,
         req: &mut Request,
         index: usize,
@@ -333,44 +343,44 @@ impl Chain {
     ) -> Result<Response> {
         // If this was the last before, yield to next phase.
         if index >= self.befores.len() {
-            return self.fail_from_handler(req, err);
+            return self.fail_from_handler(req, err).await;
         }
 
         for (i, before) in self.befores[index..].iter().enumerate() {
-            err = match before.catch(req, err) {
+            err = match before.catch(req, err).await {
                 Err(err) => err,
-                Ok(()) => return self.continue_from_before(req, index + i + 1),
+                Ok(()) => return self.continue_from_before(req, index + i + 1).await,
             };
         }
 
         // Next phase
-        self.fail_from_handler(req, err)
+        self.fail_from_handler(req, err).await
     }
 
     // Enter the normal flow in the before middleware, starting with the passed
     // index.
-    fn continue_from_before(&self, req: &mut Request, index: usize) -> Result<Response> {
+    async fn continue_from_before(&self, req: &mut Request, index: usize) -> Result<Response> {
         // If this was the last beforemiddleware, start at the handler.
         if index >= self.befores.len() {
-            return self.continue_from_handler(req);
+            return self.continue_from_handler(req).await;
         }
 
         for (i, before) in self.befores[index..].iter().enumerate() {
-            match before.before(req) {
+            match before.before(req).await {
                 Ok(()) => {}
-                Err(err) => return self.fail_from_before(req, index + i + 1, err),
+                Err(err) => return self.fail_from_before(req, index + i + 1, err).await,
             }
         }
 
         // Yield to next phase.
-        self.continue_from_handler(req)
+        self.continue_from_handler(req).await
     }
 
     // Enter the error flow from an errored handle, starting with the
     // first AfterMiddleware.
-    fn fail_from_handler(&self, req: &mut Request, err: Error) -> Result<Response> {
+    async fn fail_from_handler(&self, req: &mut Request, err: Error) -> Result<Response> {
         // Yield to next phase, nothing to do here.
-        self.fail_from_after(req, 0, err)
+        self.fail_from_after(req, 0, err).await
     }
 
     // Enter the error flow from an errored after middleware, starting
@@ -378,16 +388,21 @@ impl Chain {
     //
     // If the index is out of bounds for the after middleware Vec,
     // this instead just returns the passed error.
-    fn fail_from_after(&self, req: &mut Request, index: usize, mut err: Error) -> Result<Response> {
+    async fn fail_from_after(
+        &self,
+        req: &mut Request,
+        index: usize,
+        mut err: Error,
+    ) -> Result<Response> {
         // If this was the last after, we're done.
         if index == self.afters.len() {
             return Err(err);
         }
 
         for (i, after) in self.afters[index..].iter().enumerate() {
-            err = match after.catch(req, err) {
+            err = match after.catch(req, err).await {
                 Err(err) => err,
-                Ok(res) => return self.continue_from_after(req, index + i + 1, res),
+                Ok(res) => return self.continue_from_after(req, index + i + 1, res).await,
             }
         }
 
@@ -396,17 +411,18 @@ impl Chain {
     }
 
     // Enter the normal flow at the handler.
-    fn continue_from_handler(&self, req: &mut Request) -> Result<Response> {
+    async fn continue_from_handler(&self, req: &mut Request) -> Result<Response> {
         // unwrap is safe because it's always Some
-        match self.handler.as_ref().unwrap().handle(req) {
-            Ok(res) => self.continue_from_after(req, 0, res),
-            Err(err) => self.fail_from_handler(req, err),
+        match self.handler.as_ref().unwrap().handle(req).await {
+            Ok(res) => self.continue_from_after(req, 0, res).await,
+            Err(err) => self.fail_from_handler(req, err).await,
         }
     }
 
+    #[async_recursion]
     // Enter the normal flow in the after middleware, starting with the passed
     // index.
-    fn continue_from_after(
+    async fn continue_from_after(
         &self,
         req: &mut Request,
         index: usize,
@@ -418,9 +434,9 @@ impl Chain {
         }
 
         for (i, after) in self.afters[index..].iter().enumerate() {
-            res = match after.after(req, res) {
+            res = match after.after(req, res).await {
                 Ok(res) => res,
-                Err(err) => return self.fail_from_after(req, index + i + 1, err),
+                Err(err) => return self.fail_from_after(req, index + i + 1, err).await,
             }
         }
 
@@ -429,75 +445,82 @@ impl Chain {
     }
 }
 
+#[async_trait]
 impl<F> BeforeMiddleware for F
 where
     F: Send + Sync + 'static + Fn(&mut Request) -> Result<()>,
 {
-    fn before(&self, req: &mut Request) -> Result<()> {
+    async fn before(&self, req: &mut Request) -> Result<()> {
         (*self)(req)
     }
 }
 
+#[async_trait]
 impl BeforeMiddleware for Box<dyn BeforeMiddleware> {
-    fn before(&self, req: &mut Request) -> Result<()> {
-        (**self).before(req)
+    async fn before(&self, req: &mut Request) -> Result<()> {
+        (**self).before(req).await
     }
 
-    fn catch(&self, req: &mut Request, err: Error) -> Result<()> {
-        (**self).catch(req, err)
+    async fn catch(&self, req: &mut Request, err: Error) -> Result<()> {
+        (**self).catch(req, err).await
     }
 }
 
+#[async_trait]
 impl<T> BeforeMiddleware for Arc<T>
 where
     T: BeforeMiddleware,
 {
-    fn before(&self, req: &mut Request) -> Result<()> {
-        (**self).before(req)
+    async fn before(&self, req: &mut Request) -> Result<()> {
+        (**self).before(req).await
     }
 
-    fn catch(&self, req: &mut Request, err: Error) -> Result<()> {
-        (**self).catch(req, err)
+    async fn catch(&self, req: &mut Request, err: Error) -> Result<()> {
+        (**self).catch(req, err).await
     }
 }
 
+#[async_trait]
 impl<F> AfterMiddleware for F
 where
     F: Send + Sync + 'static + Fn(&mut Request, Response) -> Result<Response>,
 {
-    fn after(&self, req: &mut Request, res: Response) -> Result<Response> {
+    async fn after(&self, req: &mut Request, res: Response) -> Result<Response> {
         (*self)(req, res)
     }
 }
 
+#[async_trait]
 impl AfterMiddleware for Box<dyn AfterMiddleware> {
-    fn after(&self, req: &mut Request, res: Response) -> Result<Response> {
-        (**self).after(req, res)
+    async fn after(&self, req: &mut Request, res: Response) -> Result<Response> {
+        (**self).after(req, res).await
     }
 
-    fn catch(&self, req: &mut Request, err: Error) -> Result<Response> {
-        (**self).catch(req, err)
+    async fn catch(&self, req: &mut Request, err: Error) -> Result<Response> {
+        (**self).catch(req, err).await
     }
 }
 
+#[async_trait]
 impl<T> AfterMiddleware for Arc<T>
 where
     T: AfterMiddleware,
 {
-    fn after(&self, req: &mut Request, res: Response) -> Result<Response> {
-        (**self).after(req, res)
+    async fn after(&self, req: &mut Request, res: Response) -> Result<Response> {
+        (**self).after(req, res).await
     }
 
-    fn catch(&self, req: &mut Request, err: Error) -> Result<Response> {
-        (**self).catch(req, err)
+    async fn catch(&self, req: &mut Request, err: Error) -> Result<Response> {
+        (**self).catch(req, err).await
     }
 }
 
+#[async_trait(?Send)]
 impl<F> AroundMiddleware for F
 where
     F: FnOnce(Box<dyn Handler>) -> Box<dyn Handler>,
 {
-    fn around(self, handler: Box<dyn Handler>) -> Box<dyn Handler> {
+    async fn around(self, handler: Box<dyn Handler>) -> Box<dyn Handler> {
         self(handler)
     }
 }

@@ -15,7 +15,7 @@
 //!
 //! struct Application {}
 //! impl Handler for Application {
-//!     fn handle(&self, _req: &mut Request) -> Result<Response> {
+//!     async fn handle(&self, _req: &mut Request) -> Result<Response> {
 //!         // Create a response and send it back to the middlewares chain
 //!         Ok(Response::new(Body::from("¡Hola!")))
 //!     }
@@ -114,8 +114,8 @@ mod handler_service {
             if let Some(remote_addr) = self.remote_addr {
                 req.extensions_mut().insert(remote_addr);
             }
-            let res = self.handler.handle(&mut req);
-            Box::pin(async { res })
+            let handler = self.handler.clone();
+            Box::pin(async move { handler.handle(&mut req).await })
         }
     }
 
@@ -125,7 +125,7 @@ mod handler_service {
 
     impl<H> HandlerServiceBuilder<H>
     where
-        H: Handler,
+        H: Handler + Send + Sync + 'static,
     {
         pub fn new(handler: H) -> Self {
             Self {

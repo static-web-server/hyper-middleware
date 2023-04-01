@@ -25,9 +25,11 @@ keywords = [
 ]
 
 [dependencies]
-hyper = { version = "0.14", default-features = false, features = ["server", "tcp"] }
-anyhow = "1.0"
-thiserror = "1.0"
+hyper = { version = "0.14.25", default-features = false, features = ["server", "tcp"] }
+anyhow = "1.0.70"
+thiserror = "1.0.40"
+async-trait = "0.1.68"
+async-recursion = "1.0.4"
 
 [dev-dependencies]
 hyper = { version = "0.14", features = ["tcp", "server", "http1"] }
