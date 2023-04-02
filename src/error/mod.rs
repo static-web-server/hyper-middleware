@@ -4,8 +4,30 @@
 //! The `Error` type implements other several common error types
 //! to ease conversions while consuming the input value via the [`From`] trait.
 //!
-//! Additionally, when used in HTTP contexts, the `Error` type can be associated to an [HTTP Status Code][`http::StatusCode`]
+//! Additionally, when used in HTTP contexts, the `Error` type can be associated to an [HTTP Status Code][`hyper::StatusCode`].
 //! via the [`Error::with_status`][`super::Error::with_status`] method.
+//!
+//! a. Construct an [`Error`][`super::Error`] from [`hyper::Error`], [`std::io::Error`], [`anyhow::Error`] or an string.
+//!
+//! ```rust
+//! use hyper_middleware::error
+//!
+//! let err = Error::from("some error type or string");
+//! // Or using a shortcut macro
+//! let err = error!("some error type or string");
+//! ```
+//!
+//! b. Construct an [`Error`][`super::Error`] with an associated [HTTP Status Code][`hyper::StatusCode`].
+//!
+//! ```rust
+//! use hyper::StatusCode;
+//! use hyper_middleware::error
+//!
+//! let err = error!("user or password does not match").with_status(StatusCode::UNAUTHORIZED);
+//! // Or using a shortcut macro
+//! let err = http_error_unauthorized!("user or password does not match");
+//! ```
+//!
 
 use hyper::StatusCode;
 use std::fmt;
@@ -29,9 +51,9 @@ impl Error {
         self.source
     }
 
-    /// Returns an HTTP Status Code reference associated with the underlying error.
-    pub fn status(&self) -> Option<&StatusCode> {
-        self.status.as_ref()
+    /// Returns the HTTP `StatusCode` associated with the underlying error.
+    pub fn status(&self) -> Option<StatusCode> {
+        self.status
     }
 
     /// Adds/updates the current HTTP Status Code.

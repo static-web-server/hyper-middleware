@@ -15,7 +15,7 @@ macro_rules! bail {
 }
 
 // 4xx
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::BAD_REQUEST`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::BAD_REQUEST`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_bad_request {
     ($($arg:tt)*) => {{
@@ -23,7 +23,7 @@ macro_rules! http_error_bad_request {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::UNAUTHORIZED`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::UNAUTHORIZED`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_unauthorized {
     ($($arg:tt)*) => {{
@@ -31,7 +31,7 @@ macro_rules! http_error_unauthorized {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::PAYMENT_REQUIRED`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::PAYMENT_REQUIRED`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_payment_required {
     ($($arg:tt)*) => {{
@@ -39,7 +39,7 @@ macro_rules! http_error_payment_required {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::FORBIDDEN`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::FORBIDDEN`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_forbidden {
     ($($arg:tt)*) => {{
@@ -47,7 +47,7 @@ macro_rules! http_error_forbidden {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::NOT_FOUND`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::NOT_FOUND`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_not_found {
     ($($arg:tt)*) => {{
@@ -55,7 +55,7 @@ macro_rules! http_error_not_found {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::METHOD_NOT_ALLOWED`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::METHOD_NOT_ALLOWED`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_method_not_allowed {
     ($($arg:tt)*) => {{
@@ -63,7 +63,7 @@ macro_rules! http_error_method_not_allowed {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::NOT_ACCEPTABLE`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::NOT_ACCEPTABLE`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_not_acceptable {
     ($($arg:tt)*) => {{
@@ -71,7 +71,7 @@ macro_rules! http_error_not_acceptable {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::PROXY_AUTHENTICATION_REQUIRED`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::PROXY_AUTHENTICATION_REQUIRED`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_proxy_authentication_required {
     ($($arg:tt)*) => {{
@@ -79,7 +79,7 @@ macro_rules! http_error_proxy_authentication_required {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::REQUEST_TIMEOUT`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::REQUEST_TIMEOUT`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_request_timeout {
     ($($arg:tt)*) => {{
@@ -87,7 +87,7 @@ macro_rules! http_error_request_timeout {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::CONFLICT`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::CONFLICT`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_conflict {
     ($($arg:tt)*) => {{
@@ -95,7 +95,7 @@ macro_rules! http_error_conflict {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::GONE`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::GONE`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_gone {
     ($($arg:tt)*) => {{
@@ -103,7 +103,7 @@ macro_rules! http_error_gone {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::LENGTH_REQUIRED`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::LENGTH_REQUIRED`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_length_required {
     ($($arg:tt)*) => {{
@@ -111,7 +111,7 @@ macro_rules! http_error_length_required {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::PRECONDITION_FAILED`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::PRECONDITION_FAILED`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_precondition_failed {
     ($($arg:tt)*) => {{
@@ -119,7 +119,7 @@ macro_rules! http_error_precondition_failed {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::PAYLOAD_TOO_LARGE`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::PAYLOAD_TOO_LARGE`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_payload_too_large {
     ($($arg:tt)*) => {{
@@ -127,7 +127,7 @@ macro_rules! http_error_payload_too_large {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::URI_TOO_LONG`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::URI_TOO_LONG`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_uri_too_long {
     ($($arg:tt)*) => {{
@@ -135,7 +135,7 @@ macro_rules! http_error_uri_too_long {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::UNSUPPORTED_MEDIA_TYPE`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::UNSUPPORTED_MEDIA_TYPE`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_unsupported_media_type {
     ($($arg:tt)*) => {{
@@ -143,7 +143,7 @@ macro_rules! http_error_unsupported_media_type {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::RANGE_NOT_SATISFIABLE`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::RANGE_NOT_SATISFIABLE`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_range_not_satisfiable {
     ($($arg:tt)*) => {{
@@ -151,7 +151,7 @@ macro_rules! http_error_range_not_satisfiable {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::EXPECTATION_FAILED`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::EXPECTATION_FAILED`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_expectation_failed {
     ($($arg:tt)*) => {{
@@ -160,7 +160,7 @@ macro_rules! http_error_expectation_failed {
 }
 
 //  50x
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::INTERNAL_SERVER_ERROR`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::INTERNAL_SERVER_ERROR`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_internal_server_error {
     ($($arg:tt)*) => {{
@@ -168,7 +168,7 @@ macro_rules! http_error_internal_server_error {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::NOT_IMPLEMENTED`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::NOT_IMPLEMENTED`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_not_implemented {
     ($($arg:tt)*) => {{
@@ -176,7 +176,7 @@ macro_rules! http_error_not_implemented {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::BAD_GATEWAY`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::BAD_GATEWAY`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_bad_gateway {
     ($($arg:tt)*) => {{
@@ -184,7 +184,7 @@ macro_rules! http_error_bad_gateway {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::SERVICE_UNAVAILABLE`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::SERVICE_UNAVAILABLE`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_service_unavailable {
     ($($arg:tt)*) => {{
@@ -192,7 +192,7 @@ macro_rules! http_error_service_unavailable {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::GATEWAY_TIMEOUT`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::GATEWAY_TIMEOUT`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_gateway_timeout {
     ($($arg:tt)*) => {{
@@ -200,7 +200,7 @@ macro_rules! http_error_gateway_timeout {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::HTTP_VERSION_NOT_SUPPORTED`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::HTTP_VERSION_NOT_SUPPORTED`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_http_version_not_supported {
     ($($arg:tt)*) => {{
@@ -208,7 +208,7 @@ macro_rules! http_error_http_version_not_supported {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::VARIANT_ALSO_NEGOTIATES`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::VARIANT_ALSO_NEGOTIATES`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_variant_also_negotiates {
     ($($arg:tt)*) => {{
@@ -216,7 +216,7 @@ macro_rules! http_error_variant_also_negotiates {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::INSUFFICIENT_STORAGE`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::INSUFFICIENT_STORAGE`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_insufficient_storage {
     ($($arg:tt)*) => {{
@@ -224,7 +224,7 @@ macro_rules! http_error_insufficient_storage {
     }}
 }
 
-/// Constructs an [`Error`][`super::Error`] with [`http::StatusCode::LOOP_DETECTED`] from a string or existing non-anyhow error value.
+/// Constructs an [`Error`][`super::Error`] with [`hyper::StatusCode::LOOP_DETECTED`] from a string or existing non-anyhow error value.
 #[macro_export]
 macro_rules! http_error_loop_detected {
     ($($arg:tt)*) => {{
