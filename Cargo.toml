@@ -1,7 +1,7 @@
 [package]
 name = "hyper-middleware"
 description = "A compact HTTP middleware and handler system for Hyper 0.14"
-version = "0.0.8"
+version = "0.0.9"
 authors = ["Jose Quintana <https://joseluisq.net>"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/static-web-server/hyper-middleware"
