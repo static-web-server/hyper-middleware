@@ -1,8 +1,8 @@
 //! The custom error module.
 //!
-//! This module provides a custom [`Error`][`super::Error`] type with HTTP Status functionality as well as useful macros.
-//! The `Error` type implements other several common error types
-//! to ease conversions while consuming the input value via the [`From`] trait.
+//! This module provides a custom [`Error`][`super::Error`] type with HTTP Status functionality as well as useful [`macros`].
+//! The `Error` type implements other several common error types as well
+//! to ease conversion while consuming the input value via the [`From`] trait.
 //!
 //! Additionally, when used in HTTP contexts, the `Error` type can be associated to an [HTTP Status Code][`hyper::StatusCode`].
 //! via the [`Error::with_status`][`super::Error::with_status`] method.
@@ -10,7 +10,7 @@
 //! a. Construct an [`Error`][`super::Error`] from [`hyper::Error`], [`std::io::Error`], [`anyhow::Error`] or an string.
 //!
 //! ```rust
-//! use hyper_middleware::error
+//! use hyper_middleware::{Error, error};
 //!
 //! let err = Error::from("some error type or string");
 //! // Or using a shortcut macro
@@ -21,7 +21,7 @@
 //!
 //! ```rust
 //! use hyper::StatusCode;
-//! use hyper_middleware::error
+//! use hyper_middleware::{error, http_error_unauthorized};
 //!
 //! let err = error!("user or password does not match").with_status(StatusCode::UNAUTHORIZED);
 //! // Or using a shortcut macro
@@ -33,9 +33,14 @@ use hyper::StatusCode;
 use std::fmt;
 use thiserror::Error as ThisError;
 
+/// Macros that provide several facilities for working with HTTP response errors or error casting.
 pub mod macros;
 
+/// `Result<T, Error>`
+///
+/// An alias of [anyhow::Result][`anyhow::Result`] with defaults.
 pub type Result<T = (), E = Error> = anyhow::Result<T, E>;
+
 pub use anyhow::Context;
 
 /// Represents an HTTP Error.

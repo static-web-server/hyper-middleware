@@ -1,19 +1,21 @@
 //! The Hyper service module.
 //!
 //! It provides a [Hyper Service][`hyper::service::Service`] implementation intended to work with
-//! the [Hyper Server Builder][`hyper::server::Builder`].
+//! the `hyper::server::Builder`.
 //!
-//! The service allows to bind a [`Chain`][`super::Chain`] of middlewares.
+//! The service allows to bind a [`Middlewares`][`super::Middlewares`] of middlewares.
 //!
 //! ## Example
 //!
 //! ```rust
 //! use hyper::Server;
 //! use hyper_middleware::{
-//!     Body, Handler, Request, Response, Result, Service
+//!     async_trait, Body, Handler, Request, Response, Middlewares, Result, Service,
 //! };
 //!
 //! struct Application {}
+//!
+//! #[async_trait]
 //! impl Handler for Application {
 //!     async fn handle(&self, _req: &mut Request) -> Result<Response> {
 //!         // Create a response and send it back to the middlewares chain
@@ -23,16 +25,17 @@
 //!
 //! #[tokio::main(flavor = "multi_thread")]
 //! async fn main() -> Result {
-//!     let mut my_handler = Chain::new(Application {});
+//!     let mut middlewares = Middlewares::new(Application {});
 //!
-//!     let my_service = Service::new(my_handler);
+//!     let service = Service::new(middlewares);
 //!
-//!     let addr = ([127, 0, 0, 1], 8787).into();
-//!     let server = Server::bind(&addr).serve(my_service);
+//!     let addr = ([127, 0, 0, 1], 8087).into();
+//!     let server = Server::bind(&addr).serve(service);
 //!
 //!     println!("Listening on http://{}", addr);
 //!
-//!     server.await?;
+//!     // server.await?;
+//!
 //!     Ok(())
 //! }
 //! ```

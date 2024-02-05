@@ -4,12 +4,11 @@
 #![deny(dead_code)]
 
 use hyper::{header, Server, StatusCode};
-use std::{net::SocketAddr, path::PathBuf};
-
 use hyper_middleware::{
-    async_trait, AfterMiddleware, BeforeMiddleware, Body, Chain, Error, Handler, Request, Response,
-    Result, Service,
+    async_trait, AfterMiddleware, BeforeMiddleware, Body, Error, Handler, Middlewares, Request,
+    Response, Result, Service,
 };
+use std::{net::SocketAddr, path::PathBuf};
 
 struct Config {
     pub root: PathBuf,
@@ -23,16 +22,17 @@ struct Application {
 impl Handler for Application {
     async fn handle(&self, req: &mut Request) -> Result<Response> {
         // Access the Hyper incoming Request
-        println!("Handler - URI Path: {}", req.uri().path());
+        println!("Application::handle() - URI Path: {}", req.uri().path());
 
         // Access the custom app options
-        println!("Config Root: {}", self.opts.root.display());
+        println!(
+            "Application::handle() - Config Root: {}",
+            self.opts.root.display()
+        );
 
         // Access the Remote Address
-        println!(
-            "Remote Addr: {}",
-            req.extensions().get::<SocketAddr>().unwrap()
-        );
+        let remote_addr = req.extensions().get::<SocketAddr>().unwrap();
+        println!("Application::handle() - Remote Addr: {}", remote_addr);
 
         // Create a Hyper Response and send it back to the middlewares chain
         Ok(Response::new(Body::from("¡Hola!")))
@@ -44,10 +44,10 @@ struct FirstMiddleware {}
 #[async_trait]
 impl BeforeMiddleware for FirstMiddleware {
     async fn before(&self, req: &mut Request) -> Result {
-        println!("First Middleware called!");
+        println!("FirstMiddleware::before()");
 
         // Access the Hyper incoming Request
-        println!("First - URI Path: {}", req.uri().path());
+        println!("FirstMiddleware::before() - URI Path: {}", req.uri().path());
 
         Ok(())
     }
@@ -62,7 +62,7 @@ struct SecondMiddleware {}
 #[async_trait]
 impl AfterMiddleware for SecondMiddleware {
     async fn after(&self, _: &mut Request, mut res: Response) -> Result<Response> {
-        println!("Second Middleware called!");
+        println!("SecondMiddleware::after()");
 
         // Mutate the Hyper Response at convenience
         // and send it back to other middlewares on the chain
@@ -89,17 +89,15 @@ async fn main() -> Result {
         root: std::env::current_dir().unwrap(),
     };
 
-    // 1. Create a custom middleware chain
-    let mut handler = Chain::new(Application { opts });
+    // 1. Create a custom middleware chain and plug in some custom middlewares
+    let mut middlewares = Middlewares::new(Application { opts });
+    middlewares.link_before(FirstMiddleware {});
+    middlewares.link_after(SecondMiddleware {});
 
-    // 2. Plug in some custom middlewares
-    handler.link_before(FirstMiddleware {});
-    handler.link_after(SecondMiddleware {});
+    // 2. Create a Hyper service and set the current handler with its middlewares
+    let service = Service::new(middlewares);
 
-    // 3. Create a Hyper service and set the current handler with its middlewares
-    let service = Service::new(handler);
-
-    // 4. Finally just run server using the service already created
+    // 3. Finally just run server using the service already created
     let addr = ([127, 0, 0, 1], 8787).into();
     let server = Server::bind(&addr).serve(service);
 

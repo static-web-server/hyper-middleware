@@ -6,7 +6,8 @@ authors = ["Jose Quintana <https://joseluisq.net>"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/static-web-server/hyper-middleware"
 documentation = "https://docs.rs/hyper-middleware"
-edition = "2018"
+edition = "2021"
+rust-version = "1.56.0"
 categories = ["network-programming", "web-programming::http-server"]
 include = [
     "src/**/*.rs",
@@ -25,12 +26,22 @@ keywords = [
 ]
 
 [dependencies]
-hyper = { version = "0.14.27", default-features = false, features = ["server", "tcp"] }
-anyhow = "1.0.75"
-thiserror = "1.0.50"
-async-trait = "0.1.74"
+hyper = { version = "0.14.28", default-features = false, features = ["server", "tcp"] }
+anyhow = "1.0.79"
+thiserror = "1.0.56"
+async-trait = "0.1.77"
 async-recursion = "1.0.5"
 
 [dev-dependencies]
 hyper = { version = "0.14", features = ["tcp", "server", "http1"] }
 tokio = { version = "1", features = ["rt-multi-thread", "macros"], default-features = false }
+
+[profile.release]
+codegen-units = 1
+debug = false
+debug-assertions = false
+lto = "fat"
+opt-level = 3
+panic = "abort"
+rpath = false
+strip = true
